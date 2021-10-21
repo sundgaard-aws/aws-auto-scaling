@@ -28,3 +28,11 @@ yum install nodejs
 
 ## Load stress tool
 https://www.tecmint.com/linux-cpu-load-stress-test-with-stress-ng-tool/
+https://www.linuxshelltips.com/create-cpu-load-linux/
+
+``` bash
+sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y
+sudo yum install stress -y
+sudo stress-ng --cpu 4 -v --timeout 30s
+top
+```
