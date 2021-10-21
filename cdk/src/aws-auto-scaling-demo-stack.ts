@@ -81,7 +81,7 @@ export class AWSAutoScalingDemoStack extends Core.Stack {
       minCapacity:1,maxCapacity:4,desiredCapacity:1,cooldown:Duration.seconds(30)
     });
     asg.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore"));
-    asg.scaleOnCpuUtilization(MetaData.PREFIX+"asg", {targetUtilizationPercent:60,cooldown:Duration.seconds(10)})
+    asg.scaleOnCpuUtilization(MetaData.PREFIX+"asg", {targetUtilizationPercent:60,cooldown:Duration.seconds(10),estimatedInstanceWarmup:Duration.seconds(60)})
     Tags.of(asg.role).add(MetaData.NAME, MetaData.PREFIX+"role");
     Tags.of(asg).add(MetaData.NAME, MetaData.PREFIX+"asg");
     return asg;

@@ -33,6 +33,6 @@ https://www.linuxshelltips.com/create-cpu-load-linux/
 ``` bash
 sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y
 sudo yum install stress -y
-sudo stress-ng --cpu 4 -v --timeout 30s
+sudo stress --cpu 4 -v --timeout 500s
 top
 ```
