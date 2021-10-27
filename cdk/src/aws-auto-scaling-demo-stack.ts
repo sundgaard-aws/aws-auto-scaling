@@ -4,7 +4,7 @@ import * as ASG from '@aws-cdk/aws-autoscaling';
 import { MetaData } from './meta-data';
 import { AmazonLinuxEdition, AmazonLinuxGeneration, InstanceClass, InstanceSize, InstanceType, IVpc, MachineImage, Subnet, SubnetFilter, SubnetType, UserData, Vpc } from '@aws-cdk/aws-ec2';
 import { Duration, Tag, Tags } from '@aws-cdk/core';
-import { ManagedPolicy, Policy, PolicyStatement } from '@aws-cdk/aws-iam';
+import { IRole, ManagedPolicy, Policy, PolicyStatement, Role, ServicePrincipal } from '@aws-cdk/aws-iam';
 import { AdjustmentType, ScalingProcess, StepScalingAction } from '@aws-cdk/aws-autoscaling';
 
 export class AWSAutoScalingDemoStack extends Core.Stack {
@@ -79,7 +79,8 @@ export class AWSAutoScalingDemoStack extends Core.Stack {
       autoScalingGroupName:MetaData.PREFIX+"asg",
       userData:this.buildUserData(),
       vpcSubnets:vpc.selectSubnets({subnets:vpc.publicSubnets}),
-      minCapacity:0,maxCapacity:4,desiredCapacity:0,cooldown:Duration.seconds(30)
+      minCapacity:0,maxCapacity:4,desiredCapacity:0,cooldown:Duration.seconds(30),
+      role: this.buildEC2ASGRole()
     });
     asg.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore"));
     asg.scaleOnCpuUtilization(MetaData.PREFIX+"asg", {targetUtilizationPercent:60,cooldown:Duration.seconds(10),estimatedInstanceWarmup:Duration.seconds(60)});
@@ -87,6 +88,15 @@ export class AWSAutoScalingDemoStack extends Core.Stack {
     Tags.of(asg.role).add(MetaData.NAME, MetaData.PREFIX+"role");
     Tags.of(asg).add(MetaData.NAME, MetaData.PREFIX+"asg");
     return asg;
+  }
+
+  private buildEC2ASGRole(): IRole {
+    var role = new Role(this, MetaData.PREFIX+"role", {
+      assumedBy: new ServicePrincipal('ec2.amazonaws.com'),
+      roleName: MetaData.PREFIX+"ec2-asg-role",
+      description: "EC2 Role used for the auto scaling group launch configuration"
+    });
+    return role;
   }
 
   private tagVPCResources(vpc: Vpc) {
