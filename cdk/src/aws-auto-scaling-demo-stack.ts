@@ -5,6 +5,7 @@ import { MetaData } from './meta-data';
 import { AmazonLinuxEdition, AmazonLinuxGeneration, InstanceClass, InstanceSize, InstanceType, IVpc, MachineImage, Subnet, SubnetFilter, SubnetType, UserData, Vpc } from '@aws-cdk/aws-ec2';
 import { Duration, Tag, Tags } from '@aws-cdk/core';
 import { ManagedPolicy, Policy, PolicyStatement } from '@aws-cdk/aws-iam';
+import { AdjustmentType, ScalingProcess, StepScalingAction } from '@aws-cdk/aws-autoscaling';
 
 export class AWSAutoScalingDemoStack extends Core.Stack {
   constructor(scope: Core.Construct, id: string, props?: Core.StackProps) {
@@ -78,10 +79,11 @@ export class AWSAutoScalingDemoStack extends Core.Stack {
       autoScalingGroupName:MetaData.PREFIX+"asg",
       userData:this.buildUserData(),
       vpcSubnets:vpc.selectSubnets({subnets:vpc.publicSubnets}),
-      minCapacity:1,maxCapacity:4,desiredCapacity:1,cooldown:Duration.seconds(30)
+      minCapacity:0,maxCapacity:4,desiredCapacity:0,cooldown:Duration.seconds(30)
     });
     asg.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore"));
-    asg.scaleOnCpuUtilization(MetaData.PREFIX+"asg", {targetUtilizationPercent:60,cooldown:Duration.seconds(10),estimatedInstanceWarmup:Duration.seconds(60)})
+    asg.scaleOnCpuUtilization(MetaData.PREFIX+"asg", {targetUtilizationPercent:60,cooldown:Duration.seconds(10),estimatedInstanceWarmup:Duration.seconds(60)});
+    //asg.scaleOnMetric(MetaData.PREFIX+"asg", {adjustmentType:AdjustmentType.CHANGE_IN_CAPACITY,})
     Tags.of(asg.role).add(MetaData.NAME, MetaData.PREFIX+"role");
     Tags.of(asg).add(MetaData.NAME, MetaData.PREFIX+"asg");
     return asg;
