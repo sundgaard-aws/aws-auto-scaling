@@ -65,6 +65,9 @@ export class AWSAutoScalingDemoStack extends Core.Stack {
     userData.addCommands("systemctl start amazon-ssm-agent");
     userData.addCommands("yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y");
     userData.addCommands("yum install stress -y");
+    userData.addCommands("yum install httpd -y");
+    userData.addCommands("yum install git -y");
+    userData.addCommands("git clone https://github.com/sundgaard-aws/aws-auto-scaling.git");
 
     /*userData.addCommands("uptime");
     userData.addCommands("sudo stress --cpu  8 --timeout 20");
